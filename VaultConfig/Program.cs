@@ -34,14 +34,18 @@ namespace VaultConfig
             string vaultAddress = Environment.GetEnvironmentVariable("VAULT_ADDRESS");
             string yamlFilePath = Environment.GetEnvironmentVariable("CONFIG_FILE");
 
-
+            Thread.Sleep(5000);
 
             VaultConfigurer vaultConfigurer = new VaultConfigurer(rootTokenFile, vaultAddress, yamlFilePath);
             vaultConfigurer.CreateAuth();
             vaultConfigurer.CreateAccess();
             vaultConfigurer.CreateSecrets();
 
+            Log.Information("Waiting for 5 mins before ending");
+            Thread.Sleep(300000);
             Log.Information("Ending Program");
+
+
 
             // Keycloak Configuration
             //var keycloakClient = new KeycloakClient("http://keycloak.local.thesafer.net", "admin", "admin", new KeycloakOptions(adminClientId: "admin-cli"));
