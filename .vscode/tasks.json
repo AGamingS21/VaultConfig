@@ -1,0 +1,149 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/VaultConfig.sln",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary;ForceNoAlign"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "publish",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "publish",
+                "${workspaceFolder}/VaultConfig.sln",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary;ForceNoAlign"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "watch",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "watch",
+                "run",
+                "--project",
+                "${workspaceFolder}/VaultConfig.sln"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "type": "docker-build",
+            "label": "docker-build: debug",
+            "dependsOn": [
+                "build"
+            ],
+            "dockerBuild": {
+                "tag": "vault-config:dev",
+                "target": "base",
+                "dockerfile": "${workspaceFolder}/VaultConfig/Dockerfile",
+                "context": "${workspaceFolder}",
+                "pull": true
+            },
+            "netCore": {
+                "appProject": "${workspaceFolder}/VaultConfig/VaultConfig.csproj"
+            }
+        },
+        {
+            "type": "docker-build",
+            "label": "docker-build: release",
+            "dependsOn": [
+                "build"
+            ],
+            "dockerBuild": {
+                "tag": "vault-config:latest",
+                "dockerfile": "${workspaceFolder}/VaultConfig/Dockerfile",
+                "context": "${workspaceFolder}",
+                "platform": {
+                    "os": "linux",
+                    "architecture": "amd64"
+                },
+                "pull": true
+            },
+            "netCore": {
+                "appProject": "${workspaceFolder}/VaultConfig/VaultConfig.csproj"
+            }
+        },
+        {
+            "type": "docker-run",
+            "label": "docker-run: debug",
+            "dependsOn": [
+                "docker-compose up"
+            ],
+            "dockerRun": {
+                "env": {
+                    "TOKEN_FILE": "/config/token.json",
+                    "CONFIG_FILE": "/config/config.yml",
+                    "VAULT_ADDRESS": "http://127.0.0.1:8200",
+                    "OIDC_CLIENT_SECRET_VALUE": "z9ZqCQLY9Gg9C3dxITMf4AGR7VsX1Cpt"
+                },
+                "volumes": [
+                    {
+                        "localPath": "${workspaceFolder}/VaultConfig/Containers/volumes/vault-init",
+                        "containerPath": "/config",
+                        "permissions": "rw",
+                    }
+                ],
+                "network": "host"
+                
+            },
+            "netCore": {
+                "appProject": "${workspaceFolder}/VaultConfig/VaultConfig.csproj",
+                "enableDebugging": true
+            }
+        },
+        {
+            "type": "docker-run",
+            "label": "docker-run: release",
+            "dependsOn": [
+                "docker-build: release"
+            ],
+            "dockerRun": {},
+            "netCore": {
+                "appProject": "${workspaceFolder}/VaultConfig/VaultConfig.csproj"
+            }
+        },
+        {
+            "type": "docker-compose",
+            "label": "docker-compose up",
+            "dependsOn": [
+                "docker-compose down"
+            ],
+            "dockerCompose": {
+                "up": {
+                    "detached": true,
+                    "build": true
+                },
+                "files": [
+                    "${workspaceFolder}/VaultConfig/Containers/docker-compose.yml"
+                ]
+            }
+        },
+        {
+            "type": "docker-compose",
+            "label": "docker-compose down",
+            "dependsOn": [
+                "docker-build: debug"
+            ],
+            "dockerCompose": {
+                "down": {
+                    "detached": true,
+                    "build": true
+                },
+                "files": [
+                    "${workspaceFolder}/VaultConfig/Containers/docker-compose.yml"
+                ]
+            }
+        }
+    ]
+}

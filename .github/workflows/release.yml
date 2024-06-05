@@ -1,0 +1,38 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+# GitHub recommends pinning actions to a commit SHA.
+# To get a newer version, you will need to update the SHA.
+# You can also reference a tag or branch, but the action may change without warning.
+
+name: Release
+ 
+on:
+  release:
+    types: [published]
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      # - name: Run Unit Tests
+      #   run: dotnet test
+       
+      - name: log into docker
+        run: docker login --username ${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build Docker Image
+        run: docker build -f ./VaultConfig/Dockerfile  -t ${{ secrets.DOCKER_REGISTRY }}:${{ github.event.release.tag_name }} .
+      
+      - name: Push Docker Image
+        run: docker push ${{ secrets.DOCKER_REGISTRY }}:${{ github.event.release.tag_name }}
+  
+      - name: logout of Docker
+        run: docker logout ${{ secrets.DOCKER_REGISTRY }}
+      
+      

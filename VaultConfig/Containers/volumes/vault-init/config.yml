@@ -1,0 +1,65 @@
+passwords:
+    # Keycloak
+    - path: admin/oidc/clientsecret
+      data:
+        - key: client_secret
+          length: 32
+          special: false
+    - path: admin/oidc/clientsecret2
+      data:
+        - key: client_secret
+          length: 32
+          special: false
+
+    # Database user
+    - path: admin/Database
+      data:
+        - key: sa
+          length: 32
+          special: true
+
+    # Service username and password
+    - path: admin/service
+      data:
+        - key: serviceadmin
+          length: 32
+          special: false
+
+auth:
+  - type: OIDC
+    path: oidc
+    description: this is an oidc test.
+    oidc_discovery_url: https://oidcprovider.ca/
+    oidc_client_id: clientid 
+    oidc_client_secret: OIDC_CLIENT_SECRET_VALUE
+    default_role: admins
+    roles:
+      - name: admins
+        policies: ["admins"]
+        bound_audiences: vault
+        allowed_redirect_uris:
+            - https://oidcprovider.ca/oidc/oidc/callback
+        user_claim: sub
+        groups_claim: groups
+
+policies:
+    - name: users
+      rules: path "*" {capabilities = ["read", "list"]}
+    - name: admins
+      rules: path "*" {capabilities = ["create", "read", "update", "delete", "list"]}
+
+groups:
+    - name: admins
+      policies:
+        - admins
+      metadata:
+        privileged: true
+      type: external
+
+group-aliases:
+    - name: admins
+      mountPath: oidc
+      group: admins
+
+envs:
+  - OIDC_CLIENT_SECRET_VALUE
