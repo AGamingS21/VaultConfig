@@ -1,0 +1,24 @@
+name: Build Image CI
+
+on:
+  pull_request:
+ 
+ 
+
+jobs:
+      
+  build:
+    runs-on: ubuntu-latest 
+
+    steps:
+
+    - uses: actions/checkout@v3
+
+    #- name: Run Unit Tests
+
+    - name: Build Docker Container
+      run: docker build -f ./VaultConfig/Dockerfile  -t ${{ secrets.DOCKER_REGISTRY }}:latest .
+    
+
+      
+       

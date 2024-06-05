@@ -1,0 +1,42 @@
+version: "3.7"
+services:
+  vault:
+    hostname: vault
+    container_name: vault
+    image: hashicorp/vault:1.16.0
+    restart: always
+    networks:
+      - proxy
+    environment:
+      VAULT_ADDR: "http://0.0.0.0:8200"
+      VAULT_API_ADDR: "http://0.0.0.0:8200"
+    ports:
+      - "8200:8200"
+    volumes:
+      - /path/data/file:/vault/file:rw
+      - /path/data/:/vault/config:rw
+
+    cap_add:
+      - IPC_LOCK
+    entrypoint: vault server -config /vault/config/config.json
+    
+  vault-config:
+    image: agamings/vault-config:1.0.0
+    restart: always
+    container_name: vault-config
+    hostname: vault-config
+    environment:
+      TOKEN_FILE: "/config/token.json"
+      CONFIG_FILE: "/config/config.yml"
+      VAULT_ADDRESS: "VAULT ADDRESS"
+      OIDC_CLIENT_SECRET_VALUE: CLIENT SECRET FOR VAULT OIDC
+    volumes:
+      - /path/config:/config
+    command: ["sh", "/data/vault-init.sh"]
+    depends_on:
+      - vault
+    
+
+
+volumes:
+  vault-data:
