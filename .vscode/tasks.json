@@ -82,10 +82,8 @@
             ],
             "dockerRun": {
                 "env": {
-                    "TOKEN_FILE": "/config/token.json",
-                    "CONFIG_FILE": "/config/config.yml",
+                    
                     "VAULT_ADDRESS": "http://127.0.0.1:8200",
-                    "IMPORT_FILE": "/config/import.yml",
                     "ENVIRONMENT": "Dev"
                 },
                 "volumes": [

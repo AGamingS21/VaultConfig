@@ -33,8 +33,17 @@ namespace VaultConfig
             string rootTokenFile = Environment.GetEnvironmentVariable("TOKEN_FILE");
             string vaultAddress = Environment.GetEnvironmentVariable("VAULT_ADDRESS");
             string yamlFilePath = Environment.GetEnvironmentVariable("CONFIG_FILE");
-            string importFile = Environment.GetEnvironmentVariable("IMPORT_FILE");
             string environment = Environment.GetEnvironmentVariable("ENVIRONMENT");
+            string importFile = Environment.GetEnvironmentVariable("IMPORT_FILE");
+            
+            if(yamlFilePath is null)
+                yamlFilePath = "/config/config.yml";
+
+            if(rootTokenFile is null)
+                rootTokenFile = "/config/token.json";
+
+            if(importFile is null)
+                importFile = "/config/import.yml";
 
             if(environment is null)
                 environment = "";
