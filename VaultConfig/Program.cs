@@ -33,16 +33,33 @@ namespace VaultConfig
             string rootTokenFile = Environment.GetEnvironmentVariable("TOKEN_FILE");
             string vaultAddress = Environment.GetEnvironmentVariable("VAULT_ADDRESS");
             string yamlFilePath = Environment.GetEnvironmentVariable("CONFIG_FILE");
+            string importFile = Environment.GetEnvironmentVariable("IMPORT_FILE");
+            string environment = Environment.GetEnvironmentVariable("ENVIRONMENT");
 
-            Thread.Sleep(5000);
+            if(environment is null)
+                environment = "";
+
+            if(environment != "Dev")
+                Thread.Sleep(5000);
 
             VaultConfigurer vaultConfigurer = new VaultConfigurer(rootTokenFile, vaultAddress, yamlFilePath);
             vaultConfigurer.CreateAuth();
             vaultConfigurer.CreateAccess();
             vaultConfigurer.CreateSecrets();
+            if(File.Exists(importFile))
+            {
+                Log.Information("Import File has been found at " + importFile);    
+                
+                vaultConfigurer.ImportSecrets(importFile);
+
+                if(environment != "Dev")
+                    File.Delete(importFile);
+            }
+            
 
             Log.Information("Waiting for 5 mins before ending");
-            Thread.Sleep(300000);
+            if(environment != "Dev")
+                Thread.Sleep(300000);
             Log.Information("Ending Program");
 
 

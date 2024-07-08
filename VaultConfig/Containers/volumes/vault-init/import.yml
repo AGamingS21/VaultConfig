@@ -1,0 +1,7 @@
+passwords:
+  - name: example secret
+    path: vault/path/location
+    value: "ENV_VARIABLE_VALUE"
+    import: true
+    
+  

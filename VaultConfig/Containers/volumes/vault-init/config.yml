@@ -21,7 +21,7 @@ passwords:
     # Service username and password
     - path: admin/service
       data:
-        - key: serviceadmin
+        - key: serviceaccount
           length: 32
           special: false
 

@@ -85,7 +85,8 @@
                     "TOKEN_FILE": "/config/token.json",
                     "CONFIG_FILE": "/config/config.yml",
                     "VAULT_ADDRESS": "http://127.0.0.1:8200",
-                    "OIDC_CLIENT_SECRET_VALUE": "z9ZqCQLY9Gg9C3dxITMf4AGR7VsX1Cpt"
+                    "IMPORT_FILE": "/config/import.yml",
+                    "ENVIRONMENT": "Dev"
                 },
                 "volumes": [
                     {
