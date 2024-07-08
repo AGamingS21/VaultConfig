@@ -21,6 +21,7 @@ using VaultConfig.Extensions.Models;
 using Serilog;
 using VaultSharp.V1.Commons;
 using VaultConfig.Helpers;
+using Keycloak.Net.Models.Root;
 
 namespace VaultConfig
 {
@@ -31,6 +32,7 @@ namespace VaultConfig
         private VaultClient vaultClient { get; set; }
 
         private string vaultAddress { get; set; }
+        
         private RootTokenFile rootTokenFile { get; set; }
 
         public VaultConfigurer(string rootTokenFilePath, string vaultAddress, string yamlFilePath)
@@ -206,8 +208,8 @@ namespace VaultConfig
         private void WriteSecret(string engineName, string secretPath, Dictionary<string, string?> secretData)
         {
 
-            var createKeyTest = vaultClient.V1.Secrets.KeyValue.V1.WriteSecretAsync(secretPath, secretData, engineName);
-            createKeyTest.Wait();
+            var createKey = vaultClient.V1.Secrets.KeyValue.V1.WriteSecretAsync(secretPath, secretData, engineName);
+            createKey.Wait();
         }
 
         // Check if a specific key already exists. if it does then return the keys in a dictionary.
@@ -219,7 +221,7 @@ namespace VaultConfig
             {
                 var readKeys = vaultClient.V1.Secrets.KeyValue.V1.ReadSecretAsync(secretPath, engineName);
                 readKeys.Wait();
-                var existingKeys = readKeys.Result.Data.ToKeyValuePairs().Where(kvp => passwords.Any(item => item.key == kvp.Key));
+                var existingKeys = readKeys.Result.Data.ToKeyValuePairs();
                 returnKeys = existingKeys.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.ToString());
             }
             catch
@@ -317,7 +319,7 @@ namespace VaultConfig
             {
 
                 //Write Policy
-                Policy newPolicy = new Policy();
+                var newPolicy = new VaultSharp.V1.SystemBackend.Policy();
                 newPolicy.Name = policy.name;
                 newPolicy.Rules = policy.rules;
                 var writePolicy = vaultClient.V1.System.WritePolicyAsync(newPolicy);
@@ -476,5 +478,47 @@ namespace VaultConfig
 
         }
         #endregion
+
+        #region Import Secrets
+
+        public void ImportSecrets(string importFile)
+        {
+            var fileString = File.ReadAllText(importFile);
+            var importConfig = YamlHelper.AsObject<ImportList>(fileString);
+            Dictionary<string, string?> passwords;
+
+            foreach(var password in importConfig.passwords)
+            {
+                // split the first value from the rest of the path
+                int index = password.path.IndexOf('/');
+                string engineName = password.path.Substring(0, index);
+                string secretPath = password.path.Substring(index + 1);
+                // Create secrets engine if it does not already exist
+                CheckSecretsEngine(vaultClient, engineName);
+
+                // Create a password list so that this can be checked
+                var passwordList = new List<Passwords>()
+                {
+                    new Passwords(){
+                        key = password.value
+                    }
+                    
+                };
+
+                //Find all of the passwords that exist.
+                passwords = CheckIfKeyExists(engineName, secretPath, passwordList);
+                var exists = passwords.Any(item => item.Key == password.name);
+
+                if(!exists)
+                {
+                    passwords.Add(password.name, password.value);
+                    WriteSecret(engineName, secretPath, passwords);
+                    Log.Information("Created Secret: " + secretPath);
+                }    
+            }
+            
+        }
+        #endregion
+
     }
 }

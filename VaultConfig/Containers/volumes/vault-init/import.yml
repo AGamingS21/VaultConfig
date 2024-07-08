@@ -1,0 +1,12 @@
+passwords:
+  # New secret engine
+  - name: example secret
+    path: vault/path/location
+    value: "testingsecret"
+    import: true
+  # Secret that has another key within the same secret
+  - name: example secret
+    path: admin/Database
+    value: "testingsecret"
+    import: true
+  

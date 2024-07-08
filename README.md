@@ -24,6 +24,11 @@ To keep secrets such as client secrets for oidc config this app supports replaci
 
 When the program starts it will do a string replace for any occurences of the env var name with the env var value passed into the container. Make sure that the name of the env var does not match any value that you do not want to be changed.
 
+### Importing Secrests
+By providing a yml file with predefined secrets and import them right into vault with whatever name or secrets engine that is required. an example is located in the vault-init folder in this repo.
+
+Can provide env var with the location of the file or is located by default at: /config/import.yml
+
 ### Examples
 In the examples folder there is an example docker compose file that should load up both a vault instance and an instance of this project.
 
