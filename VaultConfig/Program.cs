@@ -35,7 +35,13 @@ namespace VaultConfig
             string yamlFilePath = Environment.GetEnvironmentVariable("CONFIG_FILE");
             string environment = Environment.GetEnvironmentVariable("ENVIRONMENT");
             string importFile = Environment.GetEnvironmentVariable("IMPORT_FILE");
-            
+
+            string uploadUriAndRootToken = Environment.GetEnvironmentVariable("UPLOAD_TOKEN");
+
+            bool uploadRootToken = false;
+            if(uploadUriAndRootToken != null && uploadUriAndRootToken.ToLower() == "true")
+                uploadRootToken = true;
+
             if(yamlFilePath is null)
                 yamlFilePath = "/config/config.yml";
 
@@ -51,10 +57,11 @@ namespace VaultConfig
             if(environment != "Dev")
                 Thread.Sleep(5000);
 
-            VaultConfigurer vaultConfigurer = new VaultConfigurer(rootTokenFile, vaultAddress, yamlFilePath);
+            VaultConfigurer vaultConfigurer = new VaultConfigurer(rootTokenFile, vaultAddress, yamlFilePath, uploadRootToken);
             vaultConfigurer.CreateAuth();
             vaultConfigurer.CreateAccess();
             vaultConfigurer.CreateSecrets();
+
             if(File.Exists(importFile))
             {
                 Log.Information("Import File has been found at " + importFile);    
