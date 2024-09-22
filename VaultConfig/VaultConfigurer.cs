@@ -35,7 +35,7 @@ namespace VaultConfig
         
         private RootTokenFile rootTokenFile { get; set; }
 
-        public VaultConfigurer(string rootTokenFilePath, string vaultAddress, string yamlFilePath)
+        public VaultConfigurer(string rootTokenFilePath, string vaultAddress, string yamlFilePath, bool uploadRootToken)
         {
             this.vaultAddress = vaultAddress;
             //this.rootToken = rootToken;
@@ -56,6 +56,34 @@ namespace VaultConfig
             }
             else
                 Console.WriteLine("Issue with unsealing.");
+
+            // If true then the root token password and the vault uri will be added as secrets to vault
+            if(uploadRootToken)
+            {
+                List<Passwords> rootPasswords =
+                [
+                    new Passwords()
+                    {
+                        key = "vaultUri"
+                    }
+,
+                    new Passwords()
+                    {
+                        key = "rootToken"
+                    }
+,
+                ];
+
+                vaultConfig.passwords.Add
+                (
+                    new PasswordConfig()
+                    {
+                        path = "admin/vault",
+                        data = rootPasswords
+                    }
+                );
+
+            }
 
         }
 
@@ -238,6 +266,7 @@ namespace VaultConfig
         public void CreateSecrets()
         {
             Dictionary<string, string?> passwords;
+
             foreach (var password in vaultConfig.passwords)
             {
 
@@ -259,8 +288,16 @@ namespace VaultConfig
                 var passwordsToCreate = password.data.Where(kvp => !passwords.Any(item => item.Key == kvp.key)).ToList();
                 foreach (var value in passwordsToCreate)
                 {
-
-                    string newPassword = Helpers.PasswordGenerator.GeneratePassword(value.length, 4, true, true, value.special, true);
+                    
+                    string newPassword;
+                    
+                    if(value.key == "rootToken")
+                        newPassword = rootTokenFile.rootToken;
+                    else if(value.key == "vaultUri")
+                        newPassword = vaultAddress;
+                    else
+                        newPassword = Helpers.PasswordGenerator.GeneratePassword(value.length, 4, true, true, value.special, true);
+                    
                     passwords.Add(value.key, newPassword);
                 }
 

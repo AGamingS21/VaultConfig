@@ -84,7 +84,8 @@
                 "env": {
                     
                     "VAULT_ADDRESS": "http://127.0.0.1:8200",
-                    "ENVIRONMENT": "Dev"
+                    "ENVIRONMENT": "Dev",
+                    "UPLOAD_TOKEN": "TRUE"
                 },
                 "volumes": [
                     {
