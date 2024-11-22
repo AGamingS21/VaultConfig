@@ -54,6 +54,10 @@ namespace VaultConfig.Models
         public string oidc_client_secret { get; set; }
         public string default_role { get; set; }
         public List<Roles> roles { get; set; }
+        public string? username {get; set;}
+        public string password {get; set;}
+        public string useFromKVEngine {get; set;}
+        public string[] token_policies {get; set;}
     }
 
     public class Policies

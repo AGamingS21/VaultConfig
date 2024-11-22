@@ -41,6 +41,13 @@ auth:
             - https://oidcprovider.ca/oidc/oidc/callback
         user_claim: sub
         groups_claim: groups
+  - type: UserPass
+    path: ciuser
+    description: service account for ci/cd
+    username: test
+    password: /admin/vault/ciuser
+    useFromKVEngine: true #Only do this for OIDC
+    token_policies: ["admins"]
 
 policies:
     - name: users

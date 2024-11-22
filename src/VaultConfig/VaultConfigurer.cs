@@ -439,7 +439,7 @@ namespace VaultConfig
         }
         #endregion
 
-        #region Create OIDC
+        #region Create Auth
         public void CreateAuth()
         {
             foreach (var authType in vaultConfig.auth)
@@ -447,13 +447,16 @@ namespace VaultConfig
                 switch (authType.type.ToLower())
                 {
                     case "oidc":
-                        ConfigureOIDC(authType);
+                        CreateOIDC(authType);
+                        break;
+                    case "userpass":
+                        CreateUserPass(authType);
                         break;
                 }
             }
         }
         // Creates / udpates OIDC configuration based on parameters
-        public void ConfigureOIDC(Auth authType)
+        public void CreateOIDC(Auth authType)
         {
             // Get OIDC
             var auth = vaultClient.V1.System.GetAuthBackendsAsync();
@@ -513,6 +516,49 @@ namespace VaultConfig
                 Log.Information("Created oidc role: " + role.name);
             }
 
+        }
+
+        // Creates / udpates UserPass based on parameters
+        public void CreateUserPass(Auth authType)
+        {
+            // Get OIDC
+            var auth = vaultClient.V1.System.GetAuthBackendsAsync();
+            auth.Wait();
+
+            bool authExists;
+
+            if (auth.Result.Data != null)
+                authExists = auth.Result.Data.ToKeyValuePairs().Any(a => a.Key.Contains(authType.path + "/"));
+            else
+                authExists = false;
+            // If the auth identity engine with this path does not exist then create it.
+            if (!authExists)
+            {
+                //Create userpath
+                AuthMethodType authMethodType = new AuthMethodType(authType.path);
+
+                AuthMethod authMethod = new AuthMethod()
+                {
+                    Path = authType.path,
+                    Description = authType.description,
+                    Type = authMethodType
+                };
+
+                // May Not work?
+                var createAuth = vaultClient.V1.System.MountAuthBackendAsync(authMethod);
+                createAuth.Wait();
+                Log.Information("Created auth path: " + authType.path);
+
+                // May need to use this one. Not sure if it creates or updates?
+                Dictionary<string, object> userPassValues = new Dictionary<string, object>
+                {
+                    { "password", authType.password },
+                    { "token_policies", authType.token_policies}
+                };
+
+                var userPassRequest = vaultClient.V1.System.WriteRawSecretAsync($"auth/userpass/users/{authType.username}", userPassValues);
+                userPassRequest.Wait();
+            }
         }
         #endregion
 
