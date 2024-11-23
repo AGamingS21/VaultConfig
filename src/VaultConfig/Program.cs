@@ -58,11 +58,7 @@ namespace VaultConfig
                 Thread.Sleep(5000);
 
             VaultConfigurer vaultConfigurer = new VaultConfigurer(rootTokenFile, vaultAddress, yamlFilePath, uploadRootToken);
-            vaultConfigurer.CreateSecrets();                        
-            vaultConfigurer.CreateAuth();
-            vaultConfigurer.CreateAccess();
-
-
+            
             if(File.Exists(importFile))
             {
                 Log.Information("Import File has been found at " + importFile);    
@@ -72,6 +68,10 @@ namespace VaultConfig
                 if(environment != "Dev")
                     File.Delete(importFile);
             }
+            
+            vaultConfigurer.CreateSecrets();                        
+            vaultConfigurer.CreateAuth();
+            vaultConfigurer.CreateAccess();
             
 
             Log.Information("Waiting for 5 mins before ending");
