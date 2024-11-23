@@ -43,5 +43,3 @@ If there any bugs or a feature is missing feel free to put in an issue or a PR.
 ## Roadmap:
 - Better comparison between items in vault vs config file.
 - Kubernetes file/Helm chart
-- Create individual user folders by using keycloak sdk?
-- Look into PR for Vault Sharp for the OIDC, Groups and Group Alias methods.
