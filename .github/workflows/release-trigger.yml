@@ -1,0 +1,64 @@
+name: Trigger Release
+
+on:
+#   pull_request:
+#     types:
+#         - closed
+#     branches:
+#         - main
+  push:
+    branches:
+        - main
+  #workflow_dispatch:
+
+permissions:
+  contents: write
+
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Get Next Version
+        id: semver
+        uses: ietf-tools/semver-action@v1.8.0
+        with:
+          token: ${{ github.token }}
+          branch: main
+      
+      - name: Create Release
+        uses: ncipollo/release-action@v1.4.0
+        with:
+          allowUpdates: true
+          draft: false
+          #makeLatest: true
+          commit: main
+          name: ${{ steps.semver.outputs.next }}
+          tag: ${{ steps.semver.outputs.next }}
+          body: "Release Changes"
+          token: ${{ github.token }}
+
+      - name: Create CHANGELOG
+        id: changelog
+        uses: requarks/changelog-action@v1
+        with:
+            token: ${{ github.token }}
+            tag: ${{ steps.semver.outputs.next }}
+
+            writeToFile: false
+      
+      - name: Update Release
+        uses: ncipollo/release-action@v1.4.0
+        with:
+            allowUpdates: true
+            draft: false
+            #makeLatest: true
+            commit: main
+            name: ${{ steps.semver.outputs.next }}
+            tag: ${{ steps.semver.outputs.next }}
+            body: ${{ steps.changelog.outputs.changes }}
+            token: ${{ github.token }}
