@@ -43,7 +43,7 @@ jobs:
           name: ${{ steps.semver.outputs.next }}
           tag: ${{ steps.semver.outputs.next }}
           body: "Release Changes"
-          token: ${{ github.token }}
+          token: ${{ secrets.PAT }}
 
       - name: Create CHANGELOG
         id: changelog
