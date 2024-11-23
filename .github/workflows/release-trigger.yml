@@ -9,7 +9,7 @@ on:
   push:
     branches:
         - main
-  #workflow_dispatch:
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -32,6 +32,8 @@ jobs:
           noVersionBumpBehavior: current
       
       - name: Create Release
+        if: ${{ steps.semver.outputs.next }} != ${{ steps.semver.outputs.current }}
+        id: release
         uses: ncipollo/release-action@v1.4.0
         with:
           allowUpdates: true
@@ -49,7 +51,6 @@ jobs:
         with:
             token: ${{ github.token }}
             tag: ${{ steps.semver.outputs.next }}
-
             writeToFile: false
       
       - name: Update Release
