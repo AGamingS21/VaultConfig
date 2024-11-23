@@ -8,7 +8,7 @@ WORKDIR /src
 COPY ["src/VaultConfig/VaultConfig.csproj", "src/"]
 RUN dotnet restore "src/VaultConfig.csproj"
 COPY . .
-WORKDIR "/src"
+WORKDIR "/src/src"
 RUN dotnet build "VaultConfig.csproj" -c $configuration -o /app/build
 
 FROM build AS publish
