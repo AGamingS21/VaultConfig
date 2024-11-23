@@ -16,7 +16,7 @@ permissions:
 
 
 jobs:
-  deploy:
+  trigger-release:
     runs-on: ubuntu-latest
 
     steps:
@@ -29,6 +29,7 @@ jobs:
         with:
           token: ${{ github.token }}
           branch: main
+          noVersionBumpBehavior: current
       
       - name: Create Release
         uses: ncipollo/release-action@v1.4.0
