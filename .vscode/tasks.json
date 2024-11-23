@@ -46,12 +46,12 @@
             "dockerBuild": {
                 "tag": "vault-config:dev",
                 "target": "base",
-                "dockerfile": "${workspaceFolder}/VaultConfig/Dockerfile",
+                "dockerfile": "${workspaceFolder}/src/VaultConfig/Dockerfile",
                 "context": "${workspaceFolder}",
                 "pull": true
             },
             "netCore": {
-                "appProject": "${workspaceFolder}/VaultConfig/VaultConfig.csproj"
+                "appProject": "${workspaceFolder}/src/VaultConfig/VaultConfig.csproj"
             }
         },
         {
@@ -62,7 +62,7 @@
             ],
             "dockerBuild": {
                 "tag": "vault-config:latest",
-                "dockerfile": "${workspaceFolder}/VaultConfig/Dockerfile",
+                "dockerfile": "${workspaceFolder}/src/VaultConfig/Dockerfile",
                 "context": "${workspaceFolder}",
                 "platform": {
                     "os": "linux",
@@ -71,7 +71,7 @@
                 "pull": true
             },
             "netCore": {
-                "appProject": "${workspaceFolder}/VaultConfig/VaultConfig.csproj"
+                "appProject": "${workspaceFolder}/src/VaultConfig/VaultConfig.csproj"
             }
         },
         {
@@ -89,7 +89,7 @@
                 },
                 "volumes": [
                     {
-                        "localPath": "${workspaceFolder}/VaultConfig/Containers/volumes/vault-init",
+                        "localPath": "${workspaceFolder}/.docker/volumes/vault-init",
                         "containerPath": "/config",
                         "permissions": "rw",
                     }
@@ -98,7 +98,7 @@
                 
             },
             "netCore": {
-                "appProject": "${workspaceFolder}/VaultConfig/VaultConfig.csproj",
+                "appProject": "${workspaceFolder}/src/VaultConfig/VaultConfig.csproj",
                 "enableDebugging": true
             }
         },
@@ -110,7 +110,7 @@
             ],
             "dockerRun": {},
             "netCore": {
-                "appProject": "${workspaceFolder}/VaultConfig/VaultConfig.csproj"
+                "appProject": "${workspaceFolder}/src/VaultConfig/VaultConfig.csproj"
             }
         },
         {
@@ -125,7 +125,7 @@
                     "build": true
                 },
                 "files": [
-                    "${workspaceFolder}/VaultConfig/Containers/docker-compose.yml"
+                    "${workspaceFolder}/.docker/docker-compose.yml"
                 ]
             }
         },
@@ -141,7 +141,7 @@
                     "build": true
                 },
                 "files": [
-                    "${workspaceFolder}/VaultConfig/Containers/docker-compose.yml"
+                    "${workspaceFolder}/.docker/docker-compose.yml"
                 ]
             }
         }

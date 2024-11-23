@@ -439,7 +439,7 @@ namespace VaultConfig
         }
         #endregion
 
-        #region Create OIDC
+        #region Create Auth
         public void CreateAuth()
         {
             foreach (var authType in vaultConfig.auth)
@@ -447,13 +447,16 @@ namespace VaultConfig
                 switch (authType.type.ToLower())
                 {
                     case "oidc":
-                        ConfigureOIDC(authType);
+                        CreateOIDC(authType);
+                        break;
+                    case "userpass":
+                        CreateUserPass(authType);
                         break;
                 }
             }
         }
         // Creates / udpates OIDC configuration based on parameters
-        public void ConfigureOIDC(Auth authType)
+        public void CreateOIDC(Auth authType)
         {
             // Get OIDC
             var auth = vaultClient.V1.System.GetAuthBackendsAsync();
@@ -483,6 +486,10 @@ namespace VaultConfig
                 Log.Information("Created oidc path: " + authType.path);
             }
 
+            if(authType.oidc_client_secret.useFromKVEngine)
+            {
+                authType.oidc_client_secret.value = GetSecretKeyValue(authType.oidc_client_secret.value);
+            }
 
 
             // Create/Update oidc auth method with path.
@@ -490,7 +497,7 @@ namespace VaultConfig
             {
                 oidc_discovery_url = authType.oidc_discovery_url,
                 oidc_client_id = authType.oidc_client_id,
-                oidc_client_secret = authType.oidc_client_secret,
+                oidc_client_secret = authType.oidc_client_secret.value,
                 default_role = authType.default_role
             };
             var configureOIDC = OIDCExtension.ConfigureOIDCAuth(vaultAddress, rootTokenFile.rootToken, configureOIDCAuth);
@@ -513,6 +520,77 @@ namespace VaultConfig
                 Log.Information("Created oidc role: " + role.name);
             }
 
+        }
+
+        public string GetSecretKeyValue(string path)
+        {
+            // split the first value from the rest of the path
+            int index = path.IndexOf('/');
+            string engineName = path.Substring(0, index);
+            string secretPath = path.Substring(index + 1);
+            // Get the secret key from the path
+            int indexKey = secretPath.LastIndexOf('/');
+            string secretKey = secretPath.Substring(indexKey + 1);
+            secretPath = secretPath.Substring(0, indexKey);
+            
+
+            
+            var readKeys = vaultClient.V1.Secrets.KeyValue.V1.ReadSecretAsync(secretPath, engineName);
+            readKeys.Wait();
+            // Get the specific key pair
+            var specificKey = readKeys.Result.Data[secretKey];
+
+            // Use the specific key pair
+            return specificKey.ToString();
+        }
+
+        // Creates / udpates UserPass based on parameters
+        public void CreateUserPass(Auth authType)
+        {
+            // Get OIDC
+            var auth = vaultClient.V1.System.GetAuthBackendsAsync();
+            auth.Wait();
+
+            bool authExists;
+
+            if (auth.Result.Data != null)
+                authExists = auth.Result.Data.ToKeyValuePairs().Any(a => a.Key.Contains(authType.path + "/"));
+            else
+                authExists = false;
+            // If the auth identity engine with this path does not exist then create it.
+            if (!authExists)
+            {
+                //Create userpath
+                AuthMethodType authMethodType = new AuthMethodType(authType.path);
+
+                AuthMethod authMethod = new AuthMethod()
+                {
+                    Path = authType.path,
+                    Description = authType.description,
+                    Type = authMethodType,
+                };
+
+                var createAuth = vaultClient.V1.System.MountAuthBackendAsync(authMethod);
+                createAuth.Wait();
+                Log.Information("Created auth path: " + authType.path);
+
+                foreach(var user in authType.users)
+                {
+                    if(user.useFromKVEngine)
+                    {
+                        user.password = GetSecretKeyValue(user.password);
+                    }
+                    var createUserPassRequest = new CreateUserPassRequest()
+                    {
+                        password = user.password,
+                        token_policies = user.token_policies
+                    };
+
+                    var userPassRequest = UserPassExtension.CreateUserAsync(vaultAddress, rootTokenFile.rootToken, createUserPassRequest, user.username);
+                    userPassRequest.Wait();
+                    Log.Information("Created user: " + user.username);
+                }
+            }
         }
         #endregion
 

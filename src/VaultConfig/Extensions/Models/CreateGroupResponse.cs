@@ -6,11 +6,10 @@ using System.Threading.Tasks;
 
 namespace VaultConfig.Extensions.Models
 {
-    public class CreateGroupAliasResponse
+    public class CreateGroupResponse
     {
-        public string canonical_id { get; set; }
-        public string id { get; set; }
+        public string? id { get; set; }
+        public string? name { get; set; }
     }
-
 
 }

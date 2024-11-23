@@ -7,7 +7,7 @@
             "request": "launch",
             "preLaunchTask": "docker-run: debug",
             "netCore": {
-                "appProject": "${workspaceFolder}/VaultConfig/VaultConfig.csproj"
+                "appProject": "${workspaceFolder}/src/VaultConfig/VaultConfig.csproj"
             }
         }
     ]

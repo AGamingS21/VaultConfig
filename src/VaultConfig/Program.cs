@@ -58,9 +58,10 @@ namespace VaultConfig
                 Thread.Sleep(5000);
 
             VaultConfigurer vaultConfigurer = new VaultConfigurer(rootTokenFile, vaultAddress, yamlFilePath, uploadRootToken);
+            vaultConfigurer.CreateSecrets();                        
             vaultConfigurer.CreateAuth();
             vaultConfigurer.CreateAccess();
-            vaultConfigurer.CreateSecrets();
+
 
             if(File.Exists(importFile))
             {
