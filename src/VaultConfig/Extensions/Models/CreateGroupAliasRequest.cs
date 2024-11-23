@@ -8,8 +8,8 @@ namespace VaultConfig.Extensions.Models
 {
     public class CreateGroupAliasRequest
     {
-        public string mount_accessor { get; set; }
-        public string name { get; set; }
-        public string canonical_id { get; set; }
+        public string? mount_accessor { get; set; }
+        public string? name { get; set; }
+        public string? canonical_id { get; set; }
     }
 }

@@ -31,7 +31,9 @@ auth:
     description: this is an oidc test.
     oidc_discovery_url: https://oidcprovider.ca/
     oidc_client_id: clientid 
-    oidc_client_secret: OIDC_CLIENT_SECRET_VALUE
+    oidc_client_secret: 
+      value: admin/service/serviceaccount
+      useFromKVEngine: true
     default_role: admins
     roles:
       - name: admins
@@ -42,12 +44,13 @@ auth:
         user_claim: sub
         groups_claim: groups
   - type: UserPass
-    path: ciuser
+    path: userpass
     description: service account for ci/cd
-    username: test
-    password: /admin/vault/ciuser
-    useFromKVEngine: true #Only do this for OIDC
-    token_policies: ["admins"]
+    users:
+      - username: test
+        password: SERVICE_ACCOUNT_SECRET_VALUE
+        useFromKVEngine: false
+        token_policies: ["admins"]
 
 policies:
     - name: users

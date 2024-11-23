@@ -8,8 +8,9 @@ namespace VaultConfig.Extensions.Models
 {
     public class CreateGroupAliasResponse
     {
-        public string canonical_id { get; set; }
-        public string id { get; set; }
+        
+        public string? canonical_id { get; set; }
+        public string? id { get; set; }
     }
 
 

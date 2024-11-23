@@ -8,7 +8,7 @@ namespace VaultConfig.Extensions.Models
 {
     public class RootTokenFile
     {
-        public string rootToken { get; set; }
-        public string unsealKey { get; set; }
+        public string? rootToken { get; set; }
+        public string? unsealKey { get; set; }
     }
 }

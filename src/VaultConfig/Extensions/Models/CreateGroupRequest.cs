@@ -10,10 +10,10 @@ namespace VaultConfig.Extensions.Models
 
     public class CreateGroupRequest
     {
-        public string name { get; set; }
-        public string[] policies { get; set; }
-        public Dictionary<string, string> metadata { get; set; }
-        public string type { get; set; }
+        public string? name { get; set; }
+        public string[]? policies { get; set; }
+        public Dictionary<string, string>? metadata { get; set; }
+        public string? type { get; set; }
     }
 
 }

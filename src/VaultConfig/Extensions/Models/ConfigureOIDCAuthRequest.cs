@@ -8,10 +8,10 @@ namespace VaultConfig.Extensions.Models
 {
     public class ConfigureOIDCAuthRequest
     {
-        public string oidc_discovery_url { get; set; }
-        public string oidc_client_id { get; set; }
-        public string oidc_client_secret { get; set; }
-        public string default_role { get; set; }
+        public string? oidc_discovery_url { get; set; }
+        public string? oidc_client_id { get; set; }
+        public string? oidc_client_secret { get; set; }
+        public string? default_role { get; set; }
     }
 
 }
