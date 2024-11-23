@@ -4,11 +4,11 @@ WORKDIR /app
 USER app
 FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG configuration=Release
-WORKDIR /VaultConfig
+WORKDIR /src
 COPY ["src/VaultConfig/VaultConfig.csproj", "src/"]
-RUN dotnet restore "src/VaultConfig/VaultConfig.csproj"
+RUN dotnet restore "src/VaultConfig.csproj"
 COPY . .
-WORKDIR "/src/VaultConfig"
+WORKDIR "/src"
 RUN dotnet build "VaultConfig.csproj" -c $configuration -o /app/build
 
 FROM build AS publish
